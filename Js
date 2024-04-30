@@ -1,0 +1,77 @@
+1-----------------
+<script type="text/javascript">
+// when I scroll to top I fire the event load more to show more old messages 
+  $('#messages').scroll(function() {
+  
+  var top =$('#messages').scrollTop();
+   
+    if ( top == 0) {
+        window.livewire.emit('loadMore')
+    }
+});
+
+</script>
+
+2----------------
+
+<script type="text/javascript">
+// after selecting the user I fire the event scroll to scroll the messages box to bottom
+    window.livewire.on('scroll', function()  {
+      $('#messages').animate({
+          scrollTop: $('#messages')[0].scrollHeight}, "slow");
+})
+</script>
+
+3----------------
+  // after selecting user marking or messages as read 
+<script type="text/javascript">
+                    $(".user").click(function(){
+             $(this).find('p').html('');
+           });
+ </script>
+ 
+ 4-------------------
+ 
+ <script type="text/javascript">
+ // storing my id
+ localStorage.setItem('uID',{{Auth::user()->id}});                   
+       console.log (localStorage.getItem('uID')) ;
+//lestening to the channel 'chat'.myId
+window.Echo.private('Chat.'+localStorage.getItem('uID'))
+               .listen('.Chat', (e) => {
+                 //--scrolling to bottom to see the new message
+               $('#messages').animate({
+          scrollTop: $('#messages')[0].scrollHeight}, "slow");
+               var id = @this.get('chat_id')
+              console.log(e);
+              // If the conversation betwwen my and the sender is open now ....
+              
+                 //-- appending the message tp messages box
+                 
+                  $("."+ e.message.from_user).html(`${e.recivedUnreadedMessages}`);
+               if( e.message.from_user == id)
+               {
+                $('#messages-boxx').append(`
+                  <div class="media w-50 mb-3">
+        
+          <div class="media-body ml-3">
+            <div class="bg-light rounded py-2 px-3 mb-2">
+              <p class="text-small mb-0 text-muted">${e.message.body}</p>
+            </div>
+            <p class="small text-muted">${e.message.created_at}</p>
+          </div>
+        </div>
+      `);
+               }
+               //---- else increment the num of the enreded messages between us
+               else
+               {
+                console.log("#user."+e.chat_user.id);
+                console.log(e.recivedUnreadedMessages);
+
+               }
+          });
+              
+
+  
+</script>
